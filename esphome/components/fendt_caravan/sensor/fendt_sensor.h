@@ -24,5 +24,22 @@ class FendtSensor : public CaravanComponentBase<float>, public sensor::Sensor {
 
  private:
 };
+
+class IntFendtSensor : public CaravanComponentBase<int>, public sensor::Sensor {
+ public:
+  void setup() override {
+    if (this->key_name_.empty())
+      return;
+    auto *variable = static_cast<Variable<int> *>(this->get_parent()->get_variable(this->key_name_));
+    if (variable != nullptr) {
+      this->set_variable(variable);
+    }
+  }
+
+ protected:
+  void on_decoded(const int &value) override;
+
+ private:
+};
 }  // namespace esphome::fendt_caravan
 #endif

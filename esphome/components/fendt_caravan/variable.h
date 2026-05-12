@@ -3,6 +3,7 @@
 #include "esphome/core/string_ref.h"
 #include <functional>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -17,6 +18,7 @@ class IVariable {
   bool is_active() { return this->is_active_; }
   void is_active(bool active) { this->is_active_ = active; }
   virtual void decode(const std::string &value) = 0;
+  virtual std::string get_value_str() = 0;
 
  protected:
   bool is_active_;
@@ -65,6 +67,18 @@ template<class T> class Variable : public IVariable {
     this->value_ = this->decode_funct_(value);
     this->is_active_ = true;
     this->on_decode_.call(this->value_);
+  }
+
+  std::string get_value_str() override {
+    if constexpr (std::is_same_v<T, std::string>) {
+      return this->value_;
+    } else if constexpr (std::is_same_v<T, bool>) {
+      return this->value_ ? "true" : "false";
+    } else if constexpr (std::is_arithmetic_v<T>) {
+      return std::to_string(this->value_);
+    } else {
+      return "unknown";
+    }
   }
 
  protected:

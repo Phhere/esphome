@@ -27,6 +27,7 @@ class DeviceDecoders {
   }
   static float decode_temperature(const std::string &data);
   static float decode_voltage(const std::string &data);
+  static float decode_percentage(const std::string &data);
   static int decode_int(const std::string &data);
   static time_t decode_date(const std::string &data);
   static time_t decode_time(const std::string &data);

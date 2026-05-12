@@ -3,10 +3,16 @@ from esphome.components import sensor
 import esphome.config_validation as cv
 from esphome.const import (
     CONF_TYPE,
+    DEVICE_CLASS_BATTERY,
+    DEVICE_CLASS_CURRENT,
     DEVICE_CLASS_TEMPERATURE,
+    DEVICE_CLASS_VOLTAGE,
     ENTITY_CATEGORY_DIAGNOSTIC,
     STATE_CLASS_MEASUREMENT,
     UNIT_CELSIUS,
+    UNIT_EMPTY,
+    UNIT_PERCENT,
+    UNIT_VOLT,
 )
 from esphome.cpp_generator import MockObjClass
 
@@ -27,6 +33,13 @@ ControlUnitDeviceSensor = fendt_caravan_ns.class_(
 
 FendtSensor = fendt_caravan_ns.class_(
     "FendtSensor",
+    sensor.Sensor,
+    cg.Component,
+    cg.Parented.template(CaravanDeviceComponent),
+)
+
+IntFendtSensor = fendt_caravan_ns.class_(
+    "IntFendtSensor",
     sensor.Sensor,
     cg.Component,
     cg.Parented.template(CaravanDeviceComponent),
@@ -88,6 +101,66 @@ CONFIG_SCHEMA = cv.typed_schema(
             state_class=STATE_CLASS_MEASUREMENT,
             device_class=DEVICE_CLASS_TEMPERATURE,
             key_name_="TEMP_OUT",
+        ),
+        "battery_voltage": _sensor_schema(
+            FendtSensor,
+            unit_of_measurement=UNIT_VOLT,
+            accuracy_decimals=2,
+            state_class=STATE_CLASS_MEASUREMENT,
+            device_class=DEVICE_CLASS_VOLTAGE,
+            key_name_="UBAT",
+        ),
+        "battery_voltage2": _sensor_schema(
+            FendtSensor,
+            unit_of_measurement=UNIT_VOLT,
+            accuracy_decimals=2,
+            state_class=STATE_CLASS_MEASUREMENT,
+            device_class=DEVICE_CLASS_VOLTAGE,
+            key_name_="UBATM",
+        ),
+        "isb0_ubat": _sensor_schema(
+            FendtSensor,
+            unit_of_measurement=UNIT_VOLT,
+            accuracy_decimals=2,
+            state_class=STATE_CLASS_MEASUREMENT,
+            device_class=DEVICE_CLASS_VOLTAGE,
+            key_name_="ISB0_UBAT",
+        ),
+        "battery_loading_status": _sensor_schema(
+            IntFendtSensor,
+            unit_of_measurement=UNIT_EMPTY,
+            accuracy_decimals=0,
+            state_class=STATE_CLASS_MEASUREMENT,
+            key_name_="IBAT_BAL",
+        ),
+        "temp_in_offset": _sensor_schema(
+            IntFendtSensor,
+            unit_of_measurement=UNIT_CELSIUS,
+            accuracy_decimals=0,
+            state_class=STATE_CLASS_MEASUREMENT,
+            key_name_="TEMP_IN_OFFSET",
+        ),
+        "temp_out_offset": _sensor_schema(
+            IntFendtSensor,
+            unit_of_measurement=UNIT_CELSIUS,
+            accuracy_decimals=0,
+            state_class=STATE_CLASS_MEASUREMENT,
+            key_name_="TEMP_OUT_OFFSET",
+        ),
+        "isb0_capacity": _sensor_schema(
+            IntFendtSensor,
+            unit_of_measurement=UNIT_EMPTY,
+            accuracy_decimals=0,
+            state_class=STATE_CLASS_MEASUREMENT,
+            key_name_="ISB0_CAPACITY",
+        ),
+        "ibs0_soc2": _sensor_schema(
+            FendtSensor,
+            unit_of_measurement=UNIT_PERCENT,
+            accuracy_decimals=1,
+            state_class=STATE_CLASS_MEASUREMENT,
+            device_class=DEVICE_CLASS_BATTERY,
+            key_name_="IBS0_SOC2",
         ),
     }
 )

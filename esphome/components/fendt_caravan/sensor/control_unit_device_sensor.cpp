@@ -47,6 +47,9 @@ void ControlUnitDeviceSensor::setup() {
   auto *battery_voltage2 = new Variable<float>("UBATM", DeviceDecoders::decode_voltage);
   this->add_variable(battery_voltage2);
 
+  auto *isb0_ubat = new Variable<float>("ISB0_UBAT", DeviceDecoders::decode_voltage);
+  this->add_variable(isb0_ubat);
+
   auto *date = new Variable<time_t>("DATE", DeviceDecoders::decode_date);
   this->add_variable(date);
 
@@ -78,6 +81,9 @@ void ControlUnitDeviceSensor::setup() {
   auto *therme_config = new Variable<int>("THERME_CONFIG", DeviceDecoders::decode_int);
   this->add_variable(therme_config);
 
+  auto *therme_on = new Variable<bool>("THERME_ON", DeviceDecoders::decode_bool, Commands::update_toggle<bool>);
+  this->add_variable(therme_on);
+
   auto *floor_heater_config =
       new Variable<bool>("FLOOR_HEATER_CONFIG", DeviceDecoders::decode_bool, Commands::update_toggle<bool>);
   this->add_variable(floor_heater_config);
@@ -87,6 +93,57 @@ void ControlUnitDeviceSensor::setup() {
 
   auto *radio_config = new Variable<bool>("RADIO_CONFIG", DeviceDecoders::decode_bool);
   this->add_variable(radio_config);
+
+  auto *isb0_capacity = new Variable<int>("ISB0_CAPACITY", DeviceDecoders::decode_int);
+  this->add_variable(isb0_capacity);
+
+  auto *ibs0_soc2 = new Variable<float>("IBS0_SOC2", DeviceDecoders::decode_percentage);
+  this->add_variable(ibs0_soc2);
+
+  auto *light_dusche = new Variable<bool>("LIGHT_DUSCHE", DeviceDecoders::decode_bool, Commands::update_toggle<bool>);
+  this->add_variable(light_dusche);
+
+  auto *light_wasch = new Variable<bool>("LIGHT_WASCH", DeviceDecoders::decode_bool, Commands::update_toggle<bool>);
+  this->add_variable(light_wasch);
+
+  auto *light_amb1 = new Variable<bool>("LIGHT_AMB1", DeviceDecoders::decode_bool, Commands::update_toggle<bool>);
+  this->add_variable(light_amb1);
+
+  auto *light_amb2 = new Variable<bool>("LIGHT_AMB2", DeviceDecoders::decode_bool, Commands::update_toggle<bool>);
+  this->add_variable(light_amb2);
+
+  auto *light_amb3 = new Variable<bool>("LIGHT_AMB3", DeviceDecoders::decode_bool, Commands::update_toggle<bool>);
+  this->add_variable(light_amb3);
+
+  auto *light_zusatzl = new Variable<bool>("LIGHT_ZUSATZL", DeviceDecoders::decode_bool, Commands::update_toggle<bool>);
+  this->add_variable(light_zusatzl);
+
+  auto *light_zusatzr = new Variable<bool>("LIGHT_ZUSATZR", DeviceDecoders::decode_bool, Commands::update_toggle<bool>);
+  this->add_variable(light_zusatzr);
+
+  auto *light_kueche = new Variable<bool>("LIGHT_KUECHE", DeviceDecoders::decode_bool, Commands::update_toggle<bool>);
+  this->add_variable(light_kueche);
+
+  auto *light_kueche2 = new Variable<bool>("LIGHT_KUECHE2", DeviceDecoders::decode_bool, Commands::update_toggle<bool>);
+  this->add_variable(light_kueche2);
+
+  auto *light_aussen = new Variable<bool>("LIGHT_AUSSEN", DeviceDecoders::decode_bool, Commands::update_toggle<bool>);
+  this->add_variable(light_aussen);
+
+  auto *light_dim0 = new Variable<bool>("LIGHT_DIM0", DeviceDecoders::decode_bool, Commands::update_toggle<bool>);
+  this->add_variable(light_dim0);
+
+  auto *light_dim1 = new Variable<bool>("LIGHT_DIM1", DeviceDecoders::decode_bool, Commands::update_toggle<bool>);
+  this->add_variable(light_dim1);
+
+  auto *light_dim2 = new Variable<bool>("LIGHT_DIM2", DeviceDecoders::decode_bool, Commands::update_toggle<bool>);
+  this->add_variable(light_dim2);
+
+  auto *light_dim3 = new Variable<bool>("LIGHT_DIM3", DeviceDecoders::decode_bool, Commands::update_toggle<bool>);
+  this->add_variable(light_dim3);
+
+  auto *light_dim4 = new Variable<bool>("LIGHT_DIM4", DeviceDecoders::decode_bool, Commands::update_toggle<bool>);
+  this->add_variable(light_dim4);
 }
 
 void ControlUnitDeviceSensor::dump_config() {
@@ -95,9 +152,34 @@ void ControlUnitDeviceSensor::dump_config() {
   LOG_SWITCH(TAG, "  All Lights Status", this->all_lights_switch_);
   LOG_SENSOR(TAG, "  Temp In", this->temp_in_sensor_);
   LOG_SENSOR(TAG, "  Temp Out", this->temp_out_sensor_);
+  LOG_SENSOR(TAG, "  ISB0 UBAT", this->isb0_ubat_sensor_);
+  LOG_SENSOR(TAG, "  ISB0 Capacity", this->isb0_capacity_sensor_);
+  LOG_SENSOR(TAG, "  IBS0 SOC2", this->ibs0_soc2_sensor_);
   LOG_TEXT_SENSOR(TAG, "  Power Status", this->power_status_text_sensor_);
   LOG_TEXT_SENSOR(TAG, "  Software Version", this->software_version_text_sensor_);
   LOG_SWITCH(TAG, "  Floor Heater", this->floor_heater_switch_);
+  LOG_SWITCH(TAG, "  Therme On", this->therme_on_switch_);
+  LOG_SWITCH(TAG, "  Light Dusche", this->light_dusche_switch_);
+  LOG_SWITCH(TAG, "  Light Wasch", this->light_wasch_switch_);
+  LOG_SWITCH(TAG, "  Light Amb1", this->light_amb1_switch_);
+  LOG_SWITCH(TAG, "  Light Amb2", this->light_amb2_switch_);
+  LOG_SWITCH(TAG, "  Light Amb3", this->light_amb3_switch_);
+  LOG_SWITCH(TAG, "  Light Zusatz L", this->light_zusatzl_switch_);
+  LOG_SWITCH(TAG, "  Light Zusatz R", this->light_zusatzr_switch_);
+  LOG_SWITCH(TAG, "  Light Kueche", this->light_kueche_switch_);
+  LOG_SWITCH(TAG, "  Light Kueche2", this->light_kueche2_switch_);
+  LOG_SWITCH(TAG, "  Light Aussen", this->light_aussen_switch_);
+  LOG_SWITCH(TAG, "  Light Dim0", this->light_dim0_switch_);
+  LOG_SWITCH(TAG, "  Light Dim1", this->light_dim1_switch_);
+  LOG_SWITCH(TAG, "  Light Dim2", this->light_dim2_switch_);
+  LOG_SWITCH(TAG, "  Light Dim3", this->light_dim3_switch_);
+  LOG_SWITCH(TAG, "  Light Dim4", this->light_dim4_switch_);
+
+  // Log all internal variables
+  for (auto *var : this->variables_) {
+    ESP_LOGCONFIG(TAG, "  Variable '%s': raw='%s', decoded='%s', active=%s",
+                  var->get_name().c_str(), var->get_raw_value().c_str(), var->get_value_str().c_str(), var->is_active() ? "yes" : "no");
+  }
 }
 
 void ControlUnitDeviceSensor::on_data_decoded(IVariable *variable) {

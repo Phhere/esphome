@@ -24,10 +24,29 @@ class ControlUnitDeviceSensor : public CaravanDeviceComponent, public sensor::Se
   SUB_SWITCH(main_switch);
   SUB_SENSOR(temp_in);
   SUB_SENSOR(temp_out);
+  SUB_SENSOR(isb0_ubat);
+  SUB_SENSOR(isb0_capacity);
+  SUB_SENSOR(ibs0_soc2);
   SUB_TEXT_SENSOR(power_status);
   SUB_TEXT_SENSOR(software_version);
   SUB_SWITCH(all_lights);
   SUB_SWITCH(floor_heater);
+  SUB_SWITCH(therme_on);
+  SUB_SWITCH(light_dusche);
+  SUB_SWITCH(light_wasch);
+  SUB_SWITCH(light_amb1);
+  SUB_SWITCH(light_amb2);
+  SUB_SWITCH(light_amb3);
+  SUB_SWITCH(light_zusatzl);
+  SUB_SWITCH(light_zusatzr);
+  SUB_SWITCH(light_kueche);
+  SUB_SWITCH(light_kueche2);
+  SUB_SWITCH(light_aussen);
+  SUB_SWITCH(light_dim0);
+  SUB_SWITCH(light_dim1);
+  SUB_SWITCH(light_dim2);
+  SUB_SWITCH(light_dim3);
+  SUB_SWITCH(light_dim4);
 
  protected:
   void on_data_decoded(IVariable *variable) override;
