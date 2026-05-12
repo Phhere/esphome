@@ -24,8 +24,8 @@ class ControlUnitDeviceSensor : public CaravanDeviceComponent, public sensor::Se
   SUB_SWITCH(main_switch);
   SUB_SENSOR(temp_in);
   SUB_SENSOR(temp_out);
-  SUB_SENSOR(isb0_ubat);
-  SUB_SENSOR(isb0_capacity);
+  SUB_SENSOR(ibs0_ubat);
+  SUB_SENSOR(ibs0_capacity);
   SUB_SENSOR(ibs0_soc2);
   SUB_TEXT_SENSOR(power_status);
   SUB_TEXT_SENSOR(software_version);

@@ -118,13 +118,13 @@ CONFIG_SCHEMA = cv.typed_schema(
             device_class=DEVICE_CLASS_VOLTAGE,
             key_name_="UBATM",
         ),
-        "isb0_ubat": _sensor_schema(
+        "ibs0_ubat": _sensor_schema(
             FendtSensor,
             unit_of_measurement=UNIT_VOLT,
             accuracy_decimals=2,
             state_class=STATE_CLASS_MEASUREMENT,
             device_class=DEVICE_CLASS_VOLTAGE,
-            key_name_="ISB0_UBAT",
+            key_name_="IBS0_UBAT",
         ),
         "battery_loading_status": _sensor_schema(
             IntFendtSensor,

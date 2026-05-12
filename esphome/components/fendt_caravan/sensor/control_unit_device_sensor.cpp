@@ -47,8 +47,8 @@ void ControlUnitDeviceSensor::setup() {
   auto *battery_voltage2 = new Variable<float>("UBATM", DeviceDecoders::decode_voltage);
   this->add_variable(battery_voltage2);
 
-  auto *isb0_ubat = new Variable<float>("ISB0_UBAT", DeviceDecoders::decode_voltage);
-  this->add_variable(isb0_ubat);
+  auto *ibs0_ubat = new Variable<float>("IBS0_UBAT", DeviceDecoders::decode_voltage);
+  this->add_variable(ibs0_ubat);
 
   auto *date = new Variable<time_t>("DATE", DeviceDecoders::decode_date);
   this->add_variable(date);
@@ -152,8 +152,8 @@ void ControlUnitDeviceSensor::dump_config() {
   LOG_SWITCH(TAG, "  All Lights Status", this->all_lights_switch_);
   LOG_SENSOR(TAG, "  Temp In", this->temp_in_sensor_);
   LOG_SENSOR(TAG, "  Temp Out", this->temp_out_sensor_);
-  LOG_SENSOR(TAG, "  ISB0 UBAT", this->isb0_ubat_sensor_);
-  LOG_SENSOR(TAG, "  ISB0 Capacity", this->isb0_capacity_sensor_);
+  LOG_SENSOR(TAG, "  IBS0 UBAT", this->ibs0_ubat_sensor_);
+  LOG_SENSOR(TAG, "  IBS0 Capacity", this->ibs0_capacity_sensor_);
   LOG_SENSOR(TAG, "  IBS0 SOC2", this->ibs0_soc2_sensor_);
   LOG_TEXT_SENSOR(TAG, "  Power Status", this->power_status_text_sensor_);
   LOG_TEXT_SENSOR(TAG, "  Software Version", this->software_version_text_sensor_);
