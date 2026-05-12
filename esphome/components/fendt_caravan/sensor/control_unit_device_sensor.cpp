@@ -94,8 +94,8 @@ void ControlUnitDeviceSensor::setup() {
   auto *radio_config = new Variable<bool>("RADIO_CONFIG", DeviceDecoders::decode_bool);
   this->add_variable(radio_config);
 
-  auto *isb0_capacity = new Variable<int>("ISB0_CAPACITY", DeviceDecoders::decode_int);
-  this->add_variable(isb0_capacity);
+  auto *ibs0_capacity = new Variable<int>("IBS0_CAPACITY", DeviceDecoders::decode_int);
+  this->add_variable(ibs0_capacity);
 
   auto *ibs0_soc2 = new Variable<float>("IBS0_SOC2", DeviceDecoders::decode_percentage);
   this->add_variable(ibs0_soc2);

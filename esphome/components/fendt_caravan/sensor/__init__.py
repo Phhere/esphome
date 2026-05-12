@@ -147,12 +147,12 @@ CONFIG_SCHEMA = cv.typed_schema(
             state_class=STATE_CLASS_MEASUREMENT,
             key_name_="TEMP_OUT_OFFSET",
         ),
-        "isb0_capacity": _sensor_schema(
+        "ibs0_capacity": _sensor_schema(
             IntFendtSensor,
             unit_of_measurement=UNIT_EMPTY,
             accuracy_decimals=0,
             state_class=STATE_CLASS_MEASUREMENT,
-            key_name_="ISB0_CAPACITY",
+            key_name_="IBS0_CAPACITY",
         ),
         "ibs0_soc2": _sensor_schema(
             FendtSensor,
