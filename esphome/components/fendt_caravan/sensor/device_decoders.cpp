@@ -35,6 +35,9 @@ float DeviceDecoders::decode_percentage(const std::string &data) {
   size_t start = value.find('%');
   if (start != std::string::npos)
     value.replace(start, 1, "");
+  start = value.find(',');
+  if (start != std::string::npos)
+    value.replace(start, 1, ".");
   auto result = parse_data<float>(value);
   if (!result) {
     ESP_LOGE(TAG, "Data parse error. Data: %s", value.c_str());
