@@ -4,6 +4,20 @@
 namespace esphome::fendt_caravan {
 static const char *const TAG = "FC.CU";
 
+void ControlUnitDeviceSensor::add_auto_report_entities_() {
+  for (auto *variable : this->variables_) {
+    if (auto *bool_var = dynamic_cast<Variable<bool> *>(variable)) {
+      this->add_auto_report_switch_(bool_var);
+    } else if (auto *str_var = dynamic_cast<Variable<std::string> *>(variable)) {
+      this->add_auto_report_text_sensor_(str_var);
+    } else if (auto *float_var = dynamic_cast<Variable<float> *>(variable)) {
+      this->add_auto_report_sensor_(float_var);
+    } else if (auto *int_var = dynamic_cast<Variable<int> *>(variable)) {
+      this->add_auto_report_sensor_(int_var);
+    }
+  }
+}
+
 void ControlUnitDeviceSensor::setup() {
   auto *network = new Variable<std::string>("LINE_EN", [](const std::string &value) {
     const char *tmp[] = {"Connected", "Disconnected"};
@@ -162,6 +176,10 @@ void ControlUnitDeviceSensor::setup() {
 
   auto *light_dim4 = new Variable<bool>("LIGHT_DIM4", DeviceDecoders::decode_bool, Commands::update_toggle<bool>);
   this->add_variable(light_dim4);
+
+  if (this->auto_report_entities_) {
+    this->add_auto_report_entities_();
+  }
 }
 
 void ControlUnitDeviceSensor::dump_config() {
