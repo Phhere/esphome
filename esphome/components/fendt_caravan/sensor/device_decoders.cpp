@@ -16,7 +16,7 @@ float DeviceDecoders::decode_temperature(const std::string &data) {
 }
 float DeviceDecoders::decode_voltage(const std::string &data) {
   std::string value = data;
-  size_t start = value.find('V');
+  size_t start = value.find(' V');
   if (start != std::string::npos)
     value.replace(start, 1, "");
   start = value.find(',');
@@ -29,6 +29,23 @@ float DeviceDecoders::decode_voltage(const std::string &data) {
   }
   return result.value();
 }
+
+float DeviceDecoders::decode_ampere(const std::string &data) {
+  std::string value = data;
+  size_t start = value.find(' A');
+  if (start != std::string::npos)
+    value.replace(start, 1, "");
+  start = value.find(',');
+  if (start != std::string::npos)
+    value.replace(start, 1, ".");
+  auto result = parse_data<float>(value);
+  if (!result) {
+    ESP_LOGE(TAG, "Data parse error. Data: %s", value.c_str());
+    return 0.0f;
+  }
+  return result.value();
+}
+
 
 float DeviceDecoders::decode_percentage(const std::string &data) {
   std::string value = data;
