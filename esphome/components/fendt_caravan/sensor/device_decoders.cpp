@@ -18,7 +18,7 @@ float DeviceDecoders::decode_voltage(const std::string &data) {
   std::string value = data;
   size_t start = value.find(" V");
   if (start != std::string::npos)
-    value.replace(start, 1, "");
+    value.replace(start, 2, "");
   start = value.find(',');
   if (start != std::string::npos)
     value.replace(start, 1, ".");
@@ -34,7 +34,7 @@ float DeviceDecoders::decode_ampere(const std::string &data) {
   std::string value = data;
   size_t start = value.find(" A");
   if (start != std::string::npos)
-    value.replace(start, 1, "");
+    value.replace(start, 2, "");
   start = value.find(',');
   if (start != std::string::npos)
     value.replace(start, 1, ".");
