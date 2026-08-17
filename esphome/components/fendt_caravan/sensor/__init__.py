@@ -171,6 +171,14 @@ CONFIG_SCHEMA = cv.typed_schema(
             device_class=DEVICE_CLASS_BATTERY,
             key_name_="IBS0_SOC2",
         ),
+        "ibs0_temp": _sensor_schema(
+            FendtSensor,
+            unit_of_measurement=UNIT_CELSIUS,
+            accuracy_decimals=1,
+            state_class=STATE_CLASS_MEASUREMENT,
+            device_class=DEVICE_CLASS_TEMPERATURE,
+            key_name_="IBS0_TEMPERATURE",
+        ),
     }
 )
 
