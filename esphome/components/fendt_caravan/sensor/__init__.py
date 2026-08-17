@@ -7,7 +7,7 @@ from esphome.const import (
     DEVICE_CLASS_CURRENT,
     DEVICE_CLASS_TEMPERATURE,
     DEVICE_CLASS_VOLTAGE,
-    DEVICE_CLASS_AMPERE,
+    DEVICE_CLASS_CURRENT,
     ENTITY_CATEGORY_DIAGNOSTIC,
     STATE_CLASS_MEASUREMENT,
     UNIT_CELSIUS,
@@ -129,10 +129,10 @@ CONFIG_SCHEMA = cv.typed_schema(
         ),
         "ibs0_ibat": _sensor_schema(
             FendtSensor,
-            unit_of_measurement=UNIT_VOLT,
+            unit_of_measurement=UNIT_AMPERE,
             accuracy_decimals=2,
             state_class=STATE_CLASS_MEASUREMENT,
-            device_class=DEVICE_CLASS_AMPERE,
+            device_class=DEVICE_CLASS_CURRENT,
             key_name_="IBS0_UBAT",
         ),
         "battery_loading_status": _sensor_schema(
