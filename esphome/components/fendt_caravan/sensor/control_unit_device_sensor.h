@@ -28,6 +28,7 @@ class ControlUnitDeviceSensor : public CaravanDeviceComponent, public sensor::Se
   SUB_SENSOR(ibs0_ibat);
   SUB_SENSOR(ibs0_capacity);
   SUB_SENSOR(ibs0_soc2);
+  SUB_SENSOR(ibs0_remaining_time);
   SUB_SENSOR(ibs0_temp);
   SUB_TEXT_SENSOR(power_status);
   SUB_TEXT_SENSOR(software_version);

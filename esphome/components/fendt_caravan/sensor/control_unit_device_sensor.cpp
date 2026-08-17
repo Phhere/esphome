@@ -106,6 +106,18 @@ void ControlUnitDeviceSensor::setup() {
   auto *ibs0_soc2 = new Variable<float>("IBS0_SOC2", DeviceDecoders::decode_percentage);
   this->add_variable(ibs0_soc2);
 
+  auto *ibs0_remaining_time = new Variable<float>("IBS0_REMAINING_TIME", [](const std::string &value) {
+    std::string tmp = value;
+    while (!tmp.empty() && std::isspace(static_cast<unsigned char>(tmp.front()))) tmp.erase(tmp.begin());
+    while (!tmp.empty() && std::isspace(static_cast<unsigned char>(tmp.back()))) tmp.pop_back();
+    const auto h_pos = tmp.find(" h");
+    if (h_pos != std::string::npos) tmp.erase(h_pos, 2);
+    const auto comma_pos = tmp.find(',');
+    if (comma_pos != std::string::npos) tmp.replace(comma_pos, 1, ".");
+    return std::stof(tmp);
+  });
+  this->add_variable(ibs0_remaining_time);
+
   auto *light_dusche = new Variable<bool>("LIGHT_DUSCHE", DeviceDecoders::decode_bool, Commands::update_toggle<bool>);
   this->add_variable(light_dusche);
 
@@ -162,6 +174,7 @@ void ControlUnitDeviceSensor::dump_config() {
   LOG_SENSOR(TAG, "  IBS0 Capacity", this->ibs0_capacity_sensor_);
   LOG_SENSOR(TAG, "  IBS0 IBAT", this->ibs0_ibat_sensor_);
   LOG_SENSOR(TAG, "  IBS0 SOC2", this->ibs0_soc2_sensor_);
+  LOG_SENSOR(TAG, "  IBS0 Remaining Time", this->ibs0_remaining_time_sensor_);
   LOG_SENSOR(TAG, "  IBS0 Temp", this->ibs0_temp_sensor_);
   LOG_TEXT_SENSOR(TAG, "  Power Status", this->power_status_text_sensor_);
   LOG_TEXT_SENSOR(TAG, "  Software Version", this->software_version_text_sensor_);

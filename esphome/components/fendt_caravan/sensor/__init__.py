@@ -133,7 +133,7 @@ CONFIG_SCHEMA = cv.typed_schema(
             accuracy_decimals=2,
             state_class=STATE_CLASS_MEASUREMENT,
             device_class=DEVICE_CLASS_CURRENT,
-            key_name_="IBS0_UBAT",
+            key_name_="IBS0_IBAT",
         ),
         "battery_loading_status": _sensor_schema(
             IntFendtSensor,
@@ -170,6 +170,13 @@ CONFIG_SCHEMA = cv.typed_schema(
             state_class=STATE_CLASS_MEASUREMENT,
             device_class=DEVICE_CLASS_BATTERY,
             key_name_="IBS0_SOC2",
+        ),
+        "ibs0_remaining_time": _sensor_schema(
+            FendtSensor,
+            unit_of_measurement="h",
+            accuracy_decimals=1,
+            state_class=STATE_CLASS_MEASUREMENT,
+            key_name_="IBS0_REMAINING_TIME",
         ),
         "ibs0_temp": _sensor_schema(
             FendtSensor,
