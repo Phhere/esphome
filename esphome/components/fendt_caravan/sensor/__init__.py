@@ -189,6 +189,40 @@ CONFIG_SCHEMA = cv.typed_schema(
     }
 )
 
+AUTO_SENSOR_ENTITIES = [
+    {"name": "temp_in", "key_name": "TEMP_IN", "unit": UNIT_CELSIUS, "accuracy_decimals": 1, "device_class": DEVICE_CLASS_TEMPERATURE, "state_class": STATE_CLASS_MEASUREMENT},
+    {"name": "temp_out", "key_name": "TEMP_OUT", "unit": UNIT_CELSIUS, "accuracy_decimals": 1, "device_class": DEVICE_CLASS_TEMPERATURE, "state_class": STATE_CLASS_MEASUREMENT},
+    {"name": "battery_voltage", "key_name": "UBAT", "unit": UNIT_VOLT, "accuracy_decimals": 2, "device_class": DEVICE_CLASS_VOLTAGE, "state_class": STATE_CLASS_MEASUREMENT},
+    {"name": "battery_voltage2", "key_name": "UBATM", "unit": UNIT_VOLT, "accuracy_decimals": 2, "device_class": DEVICE_CLASS_VOLTAGE, "state_class": STATE_CLASS_MEASUREMENT},
+    {"name": "ibs0_ubat", "key_name": "IBS0_UBAT", "unit": UNIT_VOLT, "accuracy_decimals": 2, "device_class": DEVICE_CLASS_VOLTAGE, "state_class": STATE_CLASS_MEASUREMENT},
+    {"name": "ibs0_ibat", "key_name": "IBS0_IBAT", "unit": "A", "accuracy_decimals": 2, "device_class": DEVICE_CLASS_CURRENT, "state_class": STATE_CLASS_MEASUREMENT},
+    {"name": "battery_loading_status", "key_name": "IBAT_BAL", "unit": UNIT_EMPTY, "accuracy_decimals": 0, "state_class": STATE_CLASS_MEASUREMENT},
+    {"name": "temp_in_offset", "key_name": "TEMP_IN_OFFSET", "unit": UNIT_CELSIUS, "accuracy_decimals": 0, "state_class": STATE_CLASS_MEASUREMENT},
+    {"name": "temp_out_offset", "key_name": "TEMP_OUT_OFFSET", "unit": UNIT_CELSIUS, "accuracy_decimals": 0, "state_class": STATE_CLASS_MEASUREMENT},
+    {"name": "ibs0_capacity", "key_name": "IBS0_CAPACITY", "unit": UNIT_EMPTY, "accuracy_decimals": 0, "state_class": STATE_CLASS_MEASUREMENT},
+    {"name": "ibs0_soc2", "key_name": "IBS0_SOC2", "unit": UNIT_PERCENT, "accuracy_decimals": 1, "device_class": DEVICE_CLASS_BATTERY, "state_class": STATE_CLASS_MEASUREMENT},
+    {"name": "ibs0_remaining_time", "key_name": "IBS0_REMAINING_TIME", "unit": "h", "accuracy_decimals": 1, "state_class": STATE_CLASS_MEASUREMENT},
+    {"name": "ibs0_temp", "key_name": "IBS0_TEMPERATURE", "unit": UNIT_CELSIUS, "accuracy_decimals": 1, "device_class": DEVICE_CLASS_TEMPERATURE, "state_class": STATE_CLASS_MEASUREMENT},
+]
+
+
+async def _create_auto_sensor(parent, item):
+    config = {
+        "id": cg.new_id(f"fendt_auto_{item['name']}"),
+        "name": item["name"],
+        "unit_of_measurement": item["unit"],
+        "accuracy_decimals": item["accuracy_decimals"],
+    }
+    if item.get("device_class") is not None:
+        config["device_class"] = item["device_class"]
+    if item.get("state_class") is not None:
+        config["state_class"] = item["state_class"]
+    var = await sensor.new_sensor(config)
+    cg.add(var.set_key_name(item["key_name"]))
+    await cg.register_component(var, config)
+    await cg.register_parented(var, parent)
+    cg.add(getattr(parent, f"set_{item['name']}_sensor")(var))
+
 
 async def to_code(config):
     parent = await cg.get_variable(config[CONF_PARENT_ID])
@@ -198,3 +232,7 @@ async def to_code(config):
     await cg.register_component(var, config)
     await cg.register_parented(var, parent)
     cg.add(getattr(parent, f"set_{config[CONF_TYPE]}_sensor")(var))
+
+    if config[CONF_TYPE] == "mcu_device":
+        for item in AUTO_SENSOR_ENTITIES:
+            await _create_auto_sensor(parent, item)
