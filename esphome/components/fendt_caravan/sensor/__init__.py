@@ -129,7 +129,7 @@ CONFIG_SCHEMA = cv.typed_schema(
         ),
         "ibs0_ibat": _sensor_schema(
             FendtSensor,
-            unit_of_measurement=UNIT_AMPERE,
+            unit_of_measurement="A",
             accuracy_decimals=2,
             state_class=STATE_CLASS_MEASUREMENT,
             device_class=DEVICE_CLASS_CURRENT,
