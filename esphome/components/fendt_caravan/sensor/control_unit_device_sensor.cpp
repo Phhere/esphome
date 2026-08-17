@@ -51,7 +51,7 @@ void ControlUnitDeviceSensor::setup() {
   this->add_variable(ibs0_ubat);
 
   auto *ibs0_ibat = new Variable<float>("IBS0_IBAT", DeviceDecoders::decode_ampere);
-  this->add_variable(ibs0_ibat)
+  this->add_variable(ibs0_ibat);
 
   auto *date = new Variable<time_t>("DATE", DeviceDecoders::decode_date);
   this->add_variable(date);
