@@ -6,8 +6,6 @@
 namespace esphome::fendt_caravan {
 
 namespace espbt = esphome::esp32_ble_tracker;
-
-using namespace std;
 const uint8_t WAIT_COMMAND = 200;
 static const char *const TAG = "fendt_caravan";
 
@@ -37,7 +35,9 @@ void FendtCaravan::loop() {
 
     ESP_LOGD(TAG, "Command sent: %s, %d", cmd.c_str(), cmd.length());
     this->last_command_time_ = time_stamp;
-    this->commands_.erase(std::remove(this->commands_.begin(), this->commands_.end(), cmd), this->commands_.end());
+    // erase only the first element (the one we just sent)
+    if (!this->commands_.empty())
+      this->commands_.erase(this->commands_.begin());
   }
 }
 
@@ -84,21 +84,27 @@ void FendtCaravan::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t
     case ESP_GATTC_NOTIFY_EVT:
       if (param->notify.handle == this->char_handle_) {
         this->wait_buffer_ = true;
-        char buffer[25];
-        memset(buffer, 0, param->notify.value_len + 1);
-        memcpy(buffer, param->notify.value, param->notify.value_len);
-        std::string result = std::string(buffer);
+        char buffer[64];
+        const size_t max_copy = sizeof(buffer) - 1;
+        const size_t copy_len = std::min<size_t>(param->notify.value_len, max_copy);
+        memset(buffer, 0, sizeof(buffer));
+        memcpy(buffer, param->notify.value, copy_len);
+        std::string chunk(buffer, copy_len);
         if (!this->last_response_.empty()) {
-          result = this->last_response_ + result;
+          // accumulate previous partial
+          chunk = this->last_response_ + chunk;
           this->last_response_.clear();
         }
-        if (strchr(buffer, '@') != nullptr) {
-          this->last_response_.append(buffer, param->notify.value_len - 1);
+        auto at_pos = chunk.find('@');
+        if (at_pos != std::string::npos) {
+          // chunk continuation marker found - append only up to marker and wait for more
+          this->last_response_.append(chunk.substr(0, at_pos));
+          // keep wait_buffer_ true until final chunk arrives
           break;
         }
         this->wait_buffer_ = false;
-        ESP_LOGD(TAG, "Notified value: %s", result.c_str());
-        this->on_data_received_(result);
+        ESP_LOGD(TAG, "Notified value: %s", chunk.c_str());
+        this->on_data_received_(chunk);
       }
       break;
     default:
@@ -106,24 +112,21 @@ void FendtCaravan::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t
   }
 }
 void FendtCaravan::add_command_(const std::string &cmd) {
-  int8_t start_index = 0;
-  int8_t end_index = 17;
-  int8_t last_index = cmd.length();
-  bool last_chunk = false;
-  while (!last_chunk) {
-    std::string chunk;
-    if (end_index < last_index) {
-      chunk = cmd.substr(0, 17);
+  const size_t CHUNK = 17;
+  size_t start_index = 0;
+  const size_t last_index = cmd.length();
+  while (start_index < last_index) {
+    const size_t remain = last_index - start_index;
+    if (remain > CHUNK) {
+      std::string chunk = cmd.substr(start_index, CHUNK);
       chunk += "@";
+      this->commands_.push_back(chunk);
+      start_index += CHUNK;
     } else {
-      chunk = cmd.substr(start_index, last_index);
-      last_chunk = true;
+      std::string chunk = cmd.substr(start_index, remain);
+      this->commands_.push_back(chunk);
+      break;
     }
-    this->commands_.push_back(chunk);
-    start_index = end_index;
-    end_index = start_index + 17;
-    if (end_index > last_index)
-      end_index = last_index;
   }
 }
 

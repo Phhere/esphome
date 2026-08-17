@@ -10,7 +10,6 @@
 #include "esphome/components/esp32_ble_client/ble_characteristic.h"
 
 namespace esphome::fendt_caravan {
-using namespace std;
 
 class FendtCaravan : public Component, public ble_client::BLEClientNode {
  public:

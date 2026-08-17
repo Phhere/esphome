@@ -114,7 +114,11 @@ void ControlUnitDeviceSensor::setup() {
     if (h_pos != std::string::npos) tmp.erase(h_pos, 2);
     const auto comma_pos = tmp.find(',');
     if (comma_pos != std::string::npos) tmp.replace(comma_pos, 1, ".");
-    return std::stof(tmp);
+    float v = 0.0f;
+    auto [ptr, ec] = std::from_chars(tmp.data(), tmp.data() + tmp.size(), v);
+    if (ec == std::errc() || ptr != tmp.data() + tmp.size())
+      return 0.0f;
+    return v;
   });
   this->add_variable(ibs0_remaining_time);
 
@@ -162,6 +166,149 @@ void ControlUnitDeviceSensor::setup() {
 
   auto *light_dim4 = new Variable<bool>("LIGHT_DIM4", DeviceDecoders::decode_bool, Commands::update_toggle<bool>);
   this->add_variable(light_dim4);
+
+  // Additional variables observed in device notifications
+  auto *panel_version = new Variable<std::string>("PANEL_VERSION", DeviceDecoders::decode_str);
+  this->add_variable(panel_version);
+
+  auto *latitude = new Variable<std::string>("LATITUDE", DeviceDecoders::decode_str);
+  this->add_variable(latitude);
+  auto *longitude = new Variable<std::string>("LONGITUDE", DeviceDecoders::decode_str);
+  this->add_variable(longitude);
+
+  auto *gsm_signal = new Variable<int>("GSM_SIGNAL", DeviceDecoders::decode_int);
+  this->add_variable(gsm_signal);
+  auto *vehicle_type = new Variable<int>("VEHICLE_TYPE", DeviceDecoders::decode_int);
+  this->add_variable(vehicle_type);
+
+  auto *ibs0_recalibrated = new Variable<int>("IBS0_RECALIBRATED", DeviceDecoders::decode_int);
+  this->add_variable(ibs0_recalibrated);
+  auto *ibs0_type = new Variable<int>("IBS0_TYPE", DeviceDecoders::decode_int);
+  this->add_variable(ibs0_type);
+  auto *ibs0_available = new Variable<bool>("IBS0_AVAILABLE", DeviceDecoders::decode_bool);
+  this->add_variable(ibs0_available);
+
+  auto *ac_dom_fj_fan_speed = new Variable<std::string>("AC_DOM_FJ_FAN_SPEED", DeviceDecoders::decode_str);
+  this->add_variable(ac_dom_fj_fan_speed);
+  auto *ac_dom_fj_enable = new Variable<std::string>("AC_DOM_FJ_ENABLE", DeviceDecoders::decode_str);
+  this->add_variable(ac_dom_fj_enable);
+  auto *ac_dom_fj_mode = new Variable<std::string>("AC_DOM_FJ_MODE", DeviceDecoders::decode_str);
+  this->add_variable(ac_dom_fj_mode);
+  auto *ac_dom_fj_targettemp = new Variable<int>("AC_DOM_FJ_TARGETTEMP", DeviceDecoders::decode_int);
+  this->add_variable(ac_dom_fj_targettemp);
+  auto *ac_dom_fj_available = new Variable<bool>("AC_DOM_FJ_AVAILABLE", DeviceDecoders::decode_bool);
+  this->add_variable(ac_dom_fj_available);
+
+  auto *ultraheat_available = new Variable<bool>("ULTRAHEAT_AVAILABLE", DeviceDecoders::decode_bool);
+  this->add_variable(ultraheat_available);
+  auto *ultraheat_onoff = new Variable<std::string>("ULTRAHEAT_ONOFF", DeviceDecoders::decode_str);
+  this->add_variable(ultraheat_onoff);
+  auto *ultraheat_power = new Variable<int>("ULTRAHEAT_POWER", [](const std::string &v) {
+    std::string tmp = v;
+    // remove non-digit characters (e.g., " W") and commas
+    for (auto it = tmp.begin(); it != tmp.end();) {
+      if (*it == ',') it = tmp.erase(it);
+      else if (!std::isdigit(static_cast<unsigned char>(*it)) && *it != '-' ) it = tmp.erase(it);
+      else ++it;
+    }
+    int out = 0;
+    auto [ptr, ec] = std::from_chars(tmp.data(), tmp.data() + tmp.size(), out);
+    if (ec == std::errc() || ptr != tmp.data() + tmp.size())
+      return 0;
+    return out;
+  });
+  this->add_variable(ultraheat_power);
+  auto *ultraheat_temp = new Variable<int>("ULTRAHEAT_TEMP", DeviceDecoders::decode_int);
+  this->add_variable(ultraheat_temp);
+
+  auto *heater_available = new Variable<bool>("HEATER_AVAILABLE", DeviceDecoders::decode_bool);
+  this->add_variable(heater_available);
+  auto *heater_onoff = new Variable<bool>("HEATER_ONOFF", DeviceDecoders::decode_bool);
+  this->add_variable(heater_onoff);
+  auto *heater_temp = new Variable<float>("HEATER_TEMP", DeviceDecoders::decode_temperature);
+  this->add_variable(heater_temp);
+  auto *heater_water = new Variable<std::string>("HEATER_WATER", DeviceDecoders::decode_str);
+  this->add_variable(heater_water);
+  auto *heater_water_temp = new Variable<std::string>("HEATER_WATER_TEMP", DeviceDecoders::decode_str);
+  this->add_variable(heater_water_temp);
+  auto *heater_el = new Variable<std::string>("HEATER_EL", DeviceDecoders::decode_heater_el);
+  this->add_variable(heater_el);
+  auto *heater_gas = new Variable<std::string>("HEATER_GAS", DeviceDecoders::decode_str);
+  this->add_variable(heater_gas);
+
+  auto *pi_pairing = new Variable<int>("PI_PAIRING", DeviceDecoders::decode_int);
+  this->add_variable(pi_pairing);
+
+  auto *light_busy = new Variable<int>("LIGHT_BUSY", DeviceDecoders::decode_int);
+  this->add_variable(light_busy);
+
+  auto *ac_truma_available = new Variable<bool>("AC_TRUMA_AVAILABLE", DeviceDecoders::decode_bool);
+  this->add_variable(ac_truma_available);
+  auto *ac_truma_type = new Variable<int>("AC_TRUMA_TYPE", DeviceDecoders::decode_int);
+  this->add_variable(ac_truma_type);
+  auto *ac_truma_enable = new Variable<std::string>("AC_TRUMA_ENABLE", DeviceDecoders::decode_str);
+  this->add_variable(ac_truma_enable);
+  auto *ac_truma_temp = new Variable<int>("AC_TRUMA_TEMP", DeviceDecoders::decode_int);
+  this->add_variable(ac_truma_temp);
+  auto *ac_truma_mode = new Variable<int>("AC_TRUMA_MODE", DeviceDecoders::decode_int);
+  this->add_variable(ac_truma_mode);
+  auto *ac_truma_fan_level = new Variable<int>("AC_TRUMA_FAN_LEVEL", DeviceDecoders::decode_int);
+  this->add_variable(ac_truma_fan_level);
+  auto *ac_truma_light_on_off = new Variable<int>("AC_TRUMA_LIGHT_ON_OFF", DeviceDecoders::decode_int);
+  this->add_variable(ac_truma_light_on_off);
+  auto *ac_truma_light_dimmer = new Variable<int>("AC_TRUMA_LIGHT_DIMMER", DeviceDecoders::decode_int);
+  this->add_variable(ac_truma_light_dimmer);
+  auto *ac_truma_mm = new Variable<int>("AC_TRUMA_MM", DeviceDecoders::decode_int);
+  this->add_variable(ac_truma_mm);
+
+  auto *th_available = new Variable<int>("TH_AVAILABLE", DeviceDecoders::decode_int);
+  this->add_variable(th_available);
+  auto *tt_available = new Variable<int>("TT_AVAILABLE", DeviceDecoders::decode_int);
+  this->add_variable(tt_available);
+  auto *th_type = new Variable<int>("TH_TYPE", DeviceDecoders::decode_int);
+  this->add_variable(th_type);
+  auto *th_a_en = new Variable<std::string>("TH_A_EN", DeviceDecoders::decode_str);
+  this->add_variable(th_a_en);
+  auto *th_w_en = new Variable<std::string>("TH_W_EN", DeviceDecoders::decode_str);
+  this->add_variable(th_w_en);
+  auto *th_a_t = new Variable<float>("TH_A_T", DeviceDecoders::decode_temperature);
+  this->add_variable(th_a_t);
+  auto *th_w_t = new Variable<float>("TH_W_T", DeviceDecoders::decode_temperature);
+  this->add_variable(th_w_t);
+  auto *th_es = new Variable<int>("TH_ES", DeviceDecoders::decode_int);
+  this->add_variable(th_es);
+  auto *th_mm = new Variable<int>("TH_MM", DeviceDecoders::decode_int);
+  this->add_variable(th_mm);
+
+  auto *sat_available = new Variable<int>("SAT_AVAILABLE", DeviceDecoders::decode_int);
+  this->add_variable(sat_available);
+  auto *sat_type = new Variable<int>("SAT_TYPE", DeviceDecoders::decode_int);
+  this->add_variable(sat_type);
+  auto *sat_status = new Variable<int>("SAT_STATUS", DeviceDecoders::decode_int);
+  this->add_variable(sat_status);
+  auto *sat_advanced_status = new Variable<int>("SAT_ADVANCED_STATUS", DeviceDecoders::decode_int);
+  this->add_variable(sat_advanced_status);
+  auto *sat_command = new Variable<int>("SAT_COMMAND", DeviceDecoders::decode_int);
+  this->add_variable(sat_command);
+  auto *sat_lat = new Variable<int>("SAT_LAT", DeviceDecoders::decode_int);
+  this->add_variable(sat_lat);
+  auto *sat_lon = new Variable<int>("SAT_LON", DeviceDecoders::decode_int);
+  this->add_variable(sat_lon);
+  auto *sat_orbital_postion = new Variable<int>("SAT_ORBITAL_POSTION", DeviceDecoders::decode_int);
+  this->add_variable(sat_orbital_postion);
+
+  auto *fridge_available = new Variable<int>("FRIDGE_AVAILABLE", DeviceDecoders::decode_int);
+  this->add_variable(fridge_available);
+  auto *fridge_on_off = new Variable<int>("FRIDGE_ON_OFF", DeviceDecoders::decode_int);
+  this->add_variable(fridge_on_off);
+  auto *fridge_mode = new Variable<int>("FRIDGE_MODE", DeviceDecoders::decode_int);
+  this->add_variable(fridge_mode);
+  auto *fridge_source = new Variable<int>("FRIDGE_SOURCE", DeviceDecoders::decode_int);
+  this->add_variable(fridge_source);
+  auto *fridge_temp = new Variable<int>("FRIDGE_TEMP", DeviceDecoders::decode_int);
+  this->add_variable(fridge_temp);
+  auto *fridge_type = new Variable<int>("FRIDGE_TYPE", DeviceDecoders::decode_int);
+  this->add_variable(fridge_type);
 }
 
 void ControlUnitDeviceSensor::dump_config() {
@@ -220,27 +367,32 @@ void ControlUnitDeviceSensor::on_state_change_command(const std::string &tag, co
   if (tag == "MAIN_SWITCH") {
     auto *hs_key_long = GET_VARIABLE(bool, "HS_KEY_LONG");
     auto *hs_key_state = GET_VARIABLE(int, "HS_KEY_STATE");
-    bool current_state = hs_key_state->get_value() > 0;
-
-    ESP_LOGV(TAG, "Main switch state changed. cs: %s", ONOFF(current_state));
-    if (!(hs_key_long && hs_key_state))
+    if (!(hs_key_long && hs_key_state)) {
+      ESP_LOGW(TAG, "HS_KEY_LONG or HS_KEY_STATE not available");
       return;
+    }
+    bool current_state = hs_key_state->get_value() > 0;
+    ESP_LOGV(TAG, "Main switch state changed. cs: %s", ONOFF(current_state));
     if (current_state) {
       hs_key_long->set_value(true);
       cmd = hs_key_long->get_command();
     } else {
       auto *hs_key = GET_VARIABLE(bool, "HS_KEY");
-      hs_key->set_value(true);
-      cmd = hs_key->get_command();
+      if (hs_key) {
+        hs_key->set_value(true);
+        cmd = hs_key->get_command();
+      }
     }
   } else if (tag == "ALL_LIGHTS_SWITCH") {
     auto *hs_key = GET_VARIABLE(bool, "HS_KEY");
     auto *hs_key_state = GET_VARIABLE(int, "HS_KEY_STATE");
+    if (!(hs_key && hs_key_state)) {
+      ESP_LOGW(TAG, "HS_KEY or HS_KEY_STATE not available");
+      return;
+    }
     bool current_state = hs_key_state->get_value() == 2;
     ESP_LOGV(TAG, "Light switch state changed. cs: %s", ONOFF(current_state));
-    if (hs_key && hs_key_state) {
-      cmd = hs_key->get_command();
-    }
+    cmd = hs_key->get_command();
   }
   if (!cmd.empty()) {
     ESP_LOGV(TAG, "Switch state changed command:%s", cmd.c_str());

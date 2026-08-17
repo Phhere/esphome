@@ -10,7 +10,6 @@
 
 namespace esphome::fendt_caravan {
 
-using namespace std;
 
 class FendtTextSensor : public CaravanComponentBase<std::string>, public text_sensor::TextSensor {
  public:

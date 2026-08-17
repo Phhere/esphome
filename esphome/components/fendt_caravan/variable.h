@@ -64,7 +64,11 @@ template<class T> class Variable : public IVariable {
 
   void decode(const std::string &value) override {
     raw_value_ = value;
-    this->value_ = this->decode_funct_(value);
+    if (this->decode_funct_) {
+      this->value_ = this->decode_funct_(value);
+    } else {
+      this->value_ = T{};
+    }
     this->is_active_ = true;
     this->on_decode_.call(this->value_);
   }
@@ -86,7 +90,7 @@ template<class T> class Variable : public IVariable {
   std::function<const std::string(const std::string &, T val)> command_funct_;
   std::function<const std::string(const std::string &, T val)> alt_command_funct_;
   CallbackManager<void(const T &value)> on_decode_{};
-  T value_;
+  T value_ = T{};
 };
 
 }  // namespace esphome::fendt_caravan

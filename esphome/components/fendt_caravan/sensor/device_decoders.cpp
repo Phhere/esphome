@@ -37,7 +37,13 @@ float DeviceDecoders::decode_temperature(const std::string &data) {
   start = value.find(',');
   if (start != std::string::npos)
     value.replace(start, 1, ".");
-  return std::stof(value);
+  trim(value);
+  auto result = parse_data<float>(value);
+  if (!result) {
+    ESP_LOGE(TAG, "Data parse error. Data: %s", value.c_str());
+    return 0.0f;
+  }
+  return result.value();
 }
 float DeviceDecoders::decode_voltage(const std::string &data) {
   std::string value = data;
@@ -101,24 +107,30 @@ int DeviceDecoders::decode_int(const std::string &data) {
 }
 
 time_t DeviceDecoders::decode_date(const std::string &data) {
-  std::istringstream date(data);
-  tm tm = {};
-  date >> std::get_time(&tm, "%d.%m.%y");
-  if (date.fail()) {
-    ESP_LOGE(TAG, "Date Parsing failed");
+  // expected format: DD.MM.YY
+  int d = 0, m = 0, y = 0;
+  if (sscanf(data.c_str(), "%2d.%2d.%2d", &d, &m, &y) != 3) {
+    ESP_LOGE(TAG, "Date Parsing failed: %s", data.c_str());
     return 0;
   }
+  tm tm = {};
+  tm.tm_mday = d;
+  tm.tm_mon = (m > 0 ? m - 1 : 0);
+  tm.tm_year = 2000 + y - 1900; // mktime expects years since 1900
   time_t ret = mktime(&tm);
   return ret;
 }
 time_t DeviceDecoders::decode_time(const std::string &data) {
-  std::istringstream date(data);
-  tm tm = {};
-  date >> std::get_time(&tm, "%H:%M:%S");
-  if (date.fail()) {
-    ESP_LOGE(TAG, "Date Parsing failed");
+  // expected format: HH:MM:SS
+  int hh = 0, mm = 0, ss = 0;
+  if (sscanf(data.c_str(), "%2d:%2d:%2d", &hh, &mm, &ss) < 2) {
+    ESP_LOGE(TAG, "Time Parsing failed: %s", data.c_str());
     return 0;
   }
+  tm tm = {};
+  tm.tm_hour = hh;
+  tm.tm_min = mm;
+  tm.tm_sec = ss;
   time_t ret = mktime(&tm);
   return ret;
 }
@@ -129,7 +141,11 @@ std::string DeviceDecoders::decode_int_str(const std::string &data, const std::v
     return "";
   }
   int val = result.value();
-  return list.at(val);
+  if (val < 0 || static_cast<size_t>(val) >= list.size()) {
+    ESP_LOGE(TAG, "Index out of range in decode_int_str: %d", val);
+    return "";
+  }
+  return list[val];
 }
 
 template<typename T> std::optional<T> DeviceDecoders::parse_data(const std::string &str) {
