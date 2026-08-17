@@ -1,5 +1,30 @@
 #include "device_decoders.h"
 
+#include <algorithm> 
+#include <cctype>
+#include <string>
+
+// Trim from the start (in place)
+inline void ltrim(std::string &s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    }));
+}
+
+// Trim from the end (in place)
+inline void rtrim(std::string &s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    }).base(), s.end());
+}
+
+// Trim from both ends (in place)
+inline void trim(std::string &s) {
+    rtrim(s);
+    ltrim(s);
+}
+
+
 #ifdef USE_ESP32
 namespace esphome::fendt_caravan {
 static const char *const TAG = "FC.COD";
@@ -22,7 +47,7 @@ float DeviceDecoders::decode_voltage(const std::string &data) {
   start = value.find(',');
   if (start != std::string::npos)
     value.replace(start, 1, ".");
-  auto result = parse_data<float>(value);
+  auto result = parse_data<float>(trim(value));
   if (!result) {
     ESP_LOGE(TAG, "Data parse error. Data: %s", value.c_str());
     return 0.0f;
@@ -38,7 +63,7 @@ float DeviceDecoders::decode_ampere(const std::string &data) {
   start = value.find(',');
   if (start != std::string::npos)
     value.replace(start, 1, ".");
-  auto result = parse_data<float>(value);
+  auto result = parse_data<float>(trim(value));
   if (!result) {
     ESP_LOGE(TAG, "Data parse error. Data: %s", value.c_str());
     return 0.0f;
@@ -55,7 +80,7 @@ float DeviceDecoders::decode_percentage(const std::string &data) {
   start = value.find(',');
   if (start != std::string::npos)
     value.replace(start, 1, ".");
-  auto result = parse_data<float>(value);
+  auto result = parse_data<float>(trim(value));
   if (!result) {
     ESP_LOGE(TAG, "Data parse error. Data: %s", value.c_str());
     return 0.0f;
